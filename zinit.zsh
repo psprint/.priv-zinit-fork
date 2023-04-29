@@ -1986,6 +1986,23 @@ builtin setopt noaliases
     builtin zle -F "$THEFD" +zinit-deploy-message
 } # ]]]
 
+# FUNCTION: .zinit-formatter-file [[[
+.zinit-formatter-file() {
+    builtin emulate -L zsh -o extendedglob
+    local -a match mbegin mend
+    REPLY=$1
+    if [[ $REPLY = (#b)(*).(*).(*) ]]; then
+        REPLY=$ZINIT[col-file]$match[1]$ZINIT[col-rst]\
+$ZINIT[col-dot].$'\e[1;3;38;5;39m'$match[2]$ZINIT[col-rst]\
+$ZINIT[col-dot].$ZINIT[col-ext]$match[3]
+    elif [[ $REPLY = (#b)(*).(*) ]]; then
+        REPLY=$ZINIT[col-file]$match[1]$ZINIT[col-rst]\
+$ZINIT[col-dot].$ZINIT[col-ext]$match[2]$ZINIT[col-rst]
+    else
+        REPLY=$ZINIT[col-file]$REPLY$ZINIT[col-rst]
+    fi
+}
+
 # FUNCTION: .zinit-formatter-dbg [[[
 .zinit-formatter-dbg() {
     builtin emulate -L zsh -o extendedglob
@@ -3337,6 +3354,7 @@ typeset -g REPLY
 
 zinit null light-mode autoload'zi-browse-symbol;zi-action-complete;zi-process-buffer' \
     for %$ZINIT[BIN_DIR]
+ZINIT_REGISTERED_PLUGINS[-1]=()
 zle -N zi-browse-symbol
 zle -N zi-browse-symbol-backwards zi-browse-symbol
 zle -N zi-browse-symbol-pbackwards zi-browse-symbol
