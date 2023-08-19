@@ -1,0 +1,25 @@
+#!/usr/bin/env zsh
+# -*- mode: sh;sh-indentation: 4;indent-tabs-mode: nil;sh-basic-offset: 4; -*-
+# Copyright (c) 2020 Sebastian Gniazdowski
+
+mg::preinit-handler() {
+    # Set the base and typically useful options.
+    builtin emulate -L zsh -o extendedglob -o warncreateglobal \
+                        -o typesetsilent -o noshortloops \
+                        -o rcquotes
+
+    local type=$1 user=$2 plugin=$3 id_as=$4 local_dir=$5 hook=$6 subtype=$7
+    local SID=$user${user:+/}$plugin
+    local SNVID=${${SID:r}%%-[v.0-9-]##}
+
+    print -l -- $PID $SID "$@"
+    [[ $SID == *.mg || $+ice[mg] == 1 ]]||return 0
+
+    if mg::ghr::download-mg "$ice[mg]" "$SID" "";then
+        +zinit-message {i} {pid}$SNVID{rst} updated correctly
+    else
+        +zinit-message {e}Problems updating: {pid}$SNVID{rst}
+    fi
+    # Suppress normal update processing of this plugin by returning 1
+    return 1
+}
